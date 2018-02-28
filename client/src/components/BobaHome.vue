@@ -1,6 +1,6 @@
 <template>
   <div>
-    <google-map name="boba"></google-map>
+    <google-map></google-map>
   </div>
 </template>
 
@@ -12,9 +12,7 @@ export default {
     'google-map': GoogleMap
   },
   data() {
-    return {
-
-    };
+    return {};
   }
 };
 </script>

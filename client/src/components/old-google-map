@@ -1,0 +1,95 @@
+<template>
+  <div class="google-map" :id="mapName"></div>
+</template>
+
+<script>
+export default {
+  name: 'google-map',
+  props: ['name'],
+  data() {
+    return {
+      mapName: this.name + '-map',
+      markerCoordinates: [
+        {
+          latitude: 51.501527,
+          longitude: -0.1921837
+        },
+        {
+          latitude: 51.505874,
+          longitude: -0.1838486
+        },
+        {
+          latitude: 51.4998973,
+          longitude: -0.202432
+        },
+      ],
+      map: null,
+      bounds: null,
+      markers: []
+    };
+  },
+  methods: {
+    toggleBounce: function(marker) {
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+    },
+    test: function() {
+      console.log('test');
+    }
+  },
+  mounted() {
+    // Init bounds object for map
+    this.bounds = new google.maps.LatLngBounds();
+
+    // Get map element from template
+    const element = document.getElementById(this.mapName);
+    // Create map center for first marker
+    const mapCenter = { latitude: 38.0, longitude: -97.0 };
+    // Map options
+    const options = {
+      zoom: 4,
+      center: new google.maps.LatLng(mapCenter.latitude, mapCenter.longitude)
+    };
+
+    // Initialize map
+    this.map = new google.maps.Map(element, options);
+
+    // Loop through marker[] to create position and marker
+    if (this.markerCoordinates) {
+      this.markerCoordinates.forEach(coord => {
+        const position = new google.maps.LatLng(
+          coord.latitude,
+          coord.longitude
+        );
+        const marker = new google.maps.Marker({
+          position,
+          map: this.map
+        });
+        
+        const infowindow = new google.maps.InfoWindow({
+          content: '<a href="#" v-on:click="test">' + 
+                   'testing' +
+                   '</div>'
+        });
+
+        google.maps.event.addListener(marker, 'click', () => {
+          this.toggleBounce(marker);
+          infowindow.open(this.map, marker);
+        });
+
+        this.markers.push(marker);
+        // Creates bounds for map to fit all markers
+        this.map.fitBounds(this.bounds.extend(position));
+      });
+    }
+  }
+};
+</script>
+
+<style scoped>
+.google-map {
+  width: 800px;
+  height: 400px;
+  margin: 20px auto;
+  background: gray;
+}
+</style>
