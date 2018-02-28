@@ -2,7 +2,7 @@
   <div class="container">
     <div class="col">
 
-      <google-map v-bind:center="gMap.center" v-bind:zoom="gMap.zoom" style=" height: 400px" class="g-map" ref="map">
+      <google-map v-bind:center="gMap.center" v-bind:zoom="gMap.zoom" style=" height: 390px" class="g-map" ref="map">
 
         <google-info-window v-bind:options="infoWindow.options" v-bind:position="infoWindow.position" v-bind:opened="infoWindow.open" v-on:closeclick="infoWindow.open=false">
           <div>
@@ -35,12 +35,12 @@
           <div class="col-md-3 mb-2">
             <select v-model="userRadius" id="inputState" class="form-control">
               <option value="804" selected>1 mile</option>
-              <option value="2414">3 miles</option>
+              <option value="4023">5 miles</option>
               <option value="8046">10 miles</option>
               <option value="20116">25 miles</option>
             </select>
           </div>
-          <div class="col-md-2 mb-2">
+          <div class="col-md-2">
             <button type="submit" class="btn btn-block btn-primary">Submit</button>
           </div>
         </div>
@@ -91,49 +91,6 @@ export default {
     };
   },
   methods: {
-    // getAddress: function() {
-    //   var geocoder = new google.maps.Geocoder();
-    //   var service = new google.maps.places.PlacesService(
-    //     this.$refs.map.$mapObject
-    //   );
-
-    //   geocoder.geocode({ address: this.userAddress }, (results, status) => {
-    //     if (status == 'OK') {
-    //       this.gMap.center = results[0].geometry.location;
-    //       this.gMap.markers.push({
-    //         position: results[0].geometry.location
-    //       });
-
-    //       var request = {
-    //         location: results[0].geometry.location,
-    //         radius: 1000,
-    //         type: ['restaurant']
-    //       };
-
-    //       service.nearbySearch(request, (results, status) => {
-    //         if (status == 'OK') {
-    //           console.log(results);
-    //         } else alert(status)
-    //       });
-
-    //       if (this.gMap.markers.length > 1) {
-    //         const bounds = new google.maps.LatLngBounds();
-    //         for (let marker of this.gMap.markers) {
-    //           bounds.extend(marker.position);
-    //         }
-    //         this.$refs.map.$mapObject.fitBounds(bounds, 150);
-    //       } else {
-    //         this.gMap.zoom = 12;
-    //       }
-
-    //       this.userAddress = '';
-    //     } else {
-    //       alert(
-    //         'Geocode was not successful for the following reason: ' + status
-    //       );
-    //     }
-    //   });
-    // },
     getAddress: function() {
       const geocoder = new google.maps.Geocoder();
       const bounds = new google.maps.LatLngBounds();
