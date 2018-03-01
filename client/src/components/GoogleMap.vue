@@ -11,7 +11,6 @@
           <div v-if="infoWindow.opening_hours.open_now" class="open">Open</div>
           <div v-else class="closed">Closed</div>
 
-          <a href="#" v-on:click="deleteMarker">Delete</a>
         </google-info-window>
 
         <google-marker v-bind:key="index" v-for="(marker, index) in gMap.markers" v-bind:position="marker.position" v-bind:clickable="true" v-on:click.stopPropagation()="toggleInfoWindow(marker,index);"></google-marker>
@@ -196,11 +195,6 @@ export default {
       this.$refs.map.panTo(marker.position);
     },
 
-    deleteMarker: function() {
-      this.$delete(this.gMap.markers, this.infoWindow.index);
-      this.infoWindow.open = false;
-    },
-    
     test: function() {
       console.log('test');
     }
