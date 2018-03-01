@@ -26,6 +26,6 @@ export default {};
   color: black;
   font-size: 1.5rem;
   vertical-align: middle;
-  color: black;
+  color: white;
 }
 </style>

@@ -1,7 +1,6 @@
 <template>
   <div class="container">
     <div class="col">
-
       <google-map v-bind:center="gMap.center" v-bind:zoom="gMap.zoom" style=" height: 390px" class="g-map" ref="map">
 
         <google-info-window v-bind:options="infoWindow.options" v-bind:position="infoWindow.position" v-bind:opened="infoWindow.open" v-on:closeclick="infoWindow.open=false">
@@ -15,25 +14,19 @@
           <a href="#" v-on:click="deleteMarker">Delete</a>
         </google-info-window>
 
-        <google-marker v-bind:key="index" v-for="(marker, index) in gMap.markers" v-bind:position="marker.position" v-bind:clickable="true" v-on:click="toggleInfoWindow(marker,index);"></google-marker>
+        <google-marker v-bind:key="index" v-for="(marker, index) in gMap.markers" v-bind:position="marker.position" v-bind:clickable="true" v-on:click.stopPropagation()="toggleInfoWindow(marker,index);"></google-marker>
 
       </google-map>
     </div>
 
-    <!-- <div class="text-center">
-      <button v-on:click="locateUser" class="btn btn-primary">Get location</button>
-    </div> -->
-
     <div class="text-center container">
-      <label>Enter your address</label>
-      <br>
       <form v-on:submit.prevent="getAddress">
         <div class="form-row justify-content-center">
-          <div class="col-md-4 mb-2">
-            <input v-model="userAddress" class="marker-input form-control" type="text" placeholder="Address" required>
+          <div class="col-6 col-md-4 mb-2">
+            <input v-model="userAddress" id="user-address" class="marker-input form-control" type="text" placeholder="Address" required>
           </div>
-          <div class="col-md-3 mb-2">
-            <select v-model="userRadius" id="inputState" class="form-control">
+          <div class="col-6 col-md-3 mb-2">
+            <select v-model="userRadius" id="user-radius" class="form-control">
               <option value="804" selected>1 mile</option>
               <option value="4023">5 miles</option>
               <option value="8046">10 miles</option>
@@ -53,21 +46,21 @@
 </template>
 
 <script>
-import * as VueGoogleMaps from 'vue2-google-maps';
-import Vue from 'vue';
+import * as VueGoogleMaps from "vue2-google-maps";
+import Vue from "vue";
 
 Vue.use(VueGoogleMaps, {
   load: {
-    key: 'AIzaSyC5VC6RZzQe84X7bFJUL3rJc-ZKIgrvw2c',
-    libraries: 'places'
+    key: "AIzaSyC5VC6RZzQe84X7bFJUL3rJc-ZKIgrvw2c",
+    libraries: "places"
   }
 });
 
 export default {
   components: {
-    'google-map': VueGoogleMaps.Map,
-    'google-marker': VueGoogleMaps.Marker,
-    'google-info-window': VueGoogleMaps.InfoWindow
+    "google-map": VueGoogleMaps.Map,
+    "google-marker": VueGoogleMaps.Marker,
+    "google-info-window": VueGoogleMaps.InfoWindow
   },
   data() {
     return {
@@ -78,16 +71,16 @@ export default {
         circle: null
       },
       infoWindow: {
-        content: '',
+        content: "",
         position: { lat: 0, lng: 0 },
         open: false,
         options: { pixelOffset: { width: 0, height: -35 } },
         index: null,
         opening_hours: {}
       },
-      userAddress: '',
-      userRadius: '804',
-      type: ''
+      userAddress: "",
+      userRadius: "804",
+      type: ""
     };
   },
   methods: {
@@ -105,14 +98,14 @@ export default {
       }
 
       geocoder.geocode({ address: this.userAddress }, (results, status) => {
-        if (status == 'OK') {
+        if (status == "OK") {
           this.gMap.center = results[0].geometry.location;
 
           this.gMap.circle = new google.maps.Circle({
-            strokeColor: '#FF0000',
+            strokeColor: "#FF0000",
             strokeOpacity: 0,
             strokeWeight: 2,
-            fillColor: '#FF0000',
+            fillColor: "#FF0000",
             fillOpacity: 0,
             map: this.$refs.map.$mapObject,
             center: this.gMap.center,
@@ -122,12 +115,12 @@ export default {
           var request = {
             location: results[0].geometry.location,
             // radius: 200,
-            query: 'milk tea',
+            query: "milk tea",
             rankBy: google.maps.places.RankBy.DISTANCE
           };
 
           service.textSearch(request, (results, status) => {
-            if (status == 'OK') {
+            if (status == "OK") {
               for (let result of results) {
                 if (
                   this.gMap.circle
@@ -156,20 +149,20 @@ export default {
                 );
                 setTimeout(() => {
                   alert(
-                    'No results found.\nPlease enter a new location or increase your search radius'
+                    "No results found.\nPlease enter a new location or increase your search radius"
                   );
                 }, 500);
               }
             } else {
               alert(
-                'Places search was not successful for the following reason: ' +
+                "Places search was not successful for the following reason: " +
                   status
               );
             }
           });
         } else {
           alert(
-            'Geocode was not successful for the following reason: ' + status
+            "Geocode was not successful for the following reason: " + status
           );
         }
       });
@@ -184,11 +177,11 @@ export default {
             this.gMap.zoom = 12;
           },
           () => {
-            alert('Geocoder failed.');
+            alert("Geocoder failed.");
           }
         );
       } else {
-        alert('Geolocation is not supported by this browser.');
+        alert("Geolocation is not supported by this browser.");
       }
     },
 
@@ -206,15 +199,25 @@ export default {
     deleteMarker: function() {
       this.$delete(this.gMap.markers, this.infoWindow.index);
       this.infoWindow.open = false;
+    },
+    
+    test: function() {
+      console.log('test');
     }
   },
-  mounted() {}
+  mounted() {
+    // Apply border-radius of .vue-map after it has loaded
+    var vueMap = document.querySelector(".vue-map");
+    vueMap.setAttribute("style", "border-radius: 0.3rem");
+  }
 };
 </script>
 
 <style scoped>
 .g-map {
-  margin: 20px auto;
+  margin: 10px auto;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+  border-radius: 0.3rem;
 }
 
 .open {
@@ -223,5 +226,31 @@ export default {
 
 .closed {
   color: red;
+}
+
+#user-address,
+#user-radius {
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  border-bottom: 2px solid #6e777eb5;
+  -webkit-appearance: none;
+  color: #6e777e
+}
+
+#user-address:focus,
+#user-radius:focus {
+  border-bottom-color:#4caaf5;
+}
+
+#user-radius {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: url(../assets/down-arrow.png) 97% / 8% no-repeat;
+}
+
+.btn-primary {
+  background-color: #4caaf5;
+  border-color: #4caaf5;
 }
 </style>
