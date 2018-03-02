@@ -18,7 +18,7 @@
       </google-map>
     </div>
 
-    <div class="text-center container">
+    <div class="text-center container form">
       <form v-on:submit.prevent="getAddress">
         <div class="form-row justify-content-center">
           <div class="col-6 col-md-4 mb-2">
@@ -36,9 +36,6 @@
             <button type="submit" class="btn btn-block btn-primary">Submit</button>
           </div>
         </div>
-        <!-- <div class="row justify-content-center mb-1">
-          <input type="text" class="form-control marker-input" placeholder="Restuaraunt" required>
-        </div> -->
       </form>
     </div>
   </div>
@@ -54,6 +51,12 @@ Vue.use(VueGoogleMaps, {
     libraries: "places"
   }
 });
+
+// https://dribbble.com/shots/3279692-WIP-Find-top-class-Sport-Instructors-or-Gyms-nearby
+// Concept for results mobile
+
+// https://dribbble.com/shots/4283139-Find-Medical-Urgent-Care-Location
+// Concept for dekstop
 
 export default {
   components: {
@@ -196,7 +199,7 @@ export default {
     },
 
     test: function() {
-      console.log('test');
+      console.log("test");
     }
   },
   mounted() {
@@ -229,12 +232,12 @@ export default {
   border-radius: 0;
   border-bottom: 2px solid #6e777eb5;
   -webkit-appearance: none;
-  color: #6e777e
+  color: #6e777e;
 }
 
 #user-address:focus,
 #user-radius:focus {
-  border-bottom-color:#4caaf5;
+  border-bottom-color: #4caaf5;
 }
 
 #user-radius {
