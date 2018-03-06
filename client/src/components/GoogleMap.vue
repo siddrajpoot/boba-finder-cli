@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="col">
-      <google-map v-bind:center="gMap.center" v-bind:zoom="gMap.zoom" style=" height: 390px" class="g-map" ref="map">
+      <google-map v-bind:center="gMap.center" v-bind:zoom="gMap.zoom" style=" height: 390px" class="g-map" ref="map" :options="gMap.options">
 
         <google-info-window v-bind:options="infoWindow.options" v-bind:position="infoWindow.position" v-bind:opened="infoWindow.open" v-on:closeclick="infoWindow.open=false">
           <div class="info-window">
@@ -12,8 +12,12 @@
             </a>
             <hr class="hr">
             <div class="formatted-address">
-              {{infoWindow.place.formatted_address}}
+              <strong>{{infoWindow.place.formatted_address}}</strong>
             </div>
+
+            <div>{{infoWindow.place.formatted_phone_number}}</div>
+
+            <a v-bind:href="infoWindow.place.website">Website</a>
 
             <div v-if="infoWindow.place.rating">
               {{infoWindow.place.rating}}/5
@@ -50,13 +54,11 @@
         </div>
       </form>
     </div>
-    <icon></icon>
   </div>
 </template>
 
 <script>
 import * as VueGoogleMaps from 'vue2-google-maps';
-import Icon from 'vue-awesome/icons'
 import Vue from 'vue';
 
 Vue.use(VueGoogleMaps, {
@@ -76,8 +78,7 @@ export default {
   components: {
     'google-map': VueGoogleMaps.Map,
     'google-marker': VueGoogleMaps.Marker,
-    'google-info-window': VueGoogleMaps.InfoWindow,
-    'icon': Icon
+    'google-info-window': VueGoogleMaps.InfoWindow
   },
   data() {
     return {
@@ -85,18 +86,24 @@ export default {
         center: { lat: 38.0, lng: -97.0 },
         zoom: 4,
         markers: [],
-        circle: null
+        circle: null,
+        options: {
+          mapTypeControl: false,
+          fullscreenControl: false,
+          streetViewControl: false
+        }
       },
       infoWindow: {
         name: '',
         position: { lat: 0, lng: 0 },
         open: false,
-        options: { pixelOffset: { width: 0, height: -35 } },
+        options: { pixelOffset: { width: 0, height: -35 }, maxWidth: 225 },
         index: null,
         place: {
           name: '',
           opening_hours: {}
-        }
+        },
+        photos: null
       },
       userAddress: '',
       userRadius: '804',
@@ -140,7 +147,6 @@ export default {
           };
 
           service.textSearch(request, (results, status) => {
-            console.log(results[0]);
             if (status == 'OK') {
               for (let result of results) {
                 if (
@@ -220,11 +226,13 @@ export default {
 
           this.infoWindow.place = place;
 
-          this.infoWindow.name = marker.name;
-          this.infoWindow.opening_hours = marker.opening_hours;
-          this.infoWindow.rating = marker.rating;
+          var photo = this.infoWindow.place.photos[0].getUrl({
+            maxHeight: 500,
+            maxWidth: 500
+          });
+          console.log(photo);
 
-          this.$refs.map.panTo(marker.position);
+          this.$refs.map.panTo({lat: marker.position.lat() + .001, lng: marker.position.lng()});
         }
       });
     },
@@ -277,13 +285,14 @@ export default {
   background: url(../assets/down-arrow.png) 97% / 8% no-repeat;
 }
 
-.btn-primary {
+.btn-primary {  
   background-color: #4caaf5;
   border-color: #4caaf5;
 }
 
 .place-url {
   color: #4caaf5;
+  font-size: 16px;
 }
 
 .info-window {
@@ -294,7 +303,4 @@ export default {
   margin: 6px 0;
 }
 
-.info-window .formatted-address {
-  margin: 10px 0;
-}
 </style>
