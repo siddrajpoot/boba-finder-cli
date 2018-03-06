@@ -4,12 +4,24 @@
       <google-map v-bind:center="gMap.center" v-bind:zoom="gMap.zoom" style=" height: 390px" class="g-map" ref="map">
 
         <google-info-window v-bind:options="infoWindow.options" v-bind:position="infoWindow.position" v-bind:opened="infoWindow.open" v-on:closeclick="infoWindow.open=false">
-          <div>
-            <strong>{{infoWindow.content}}</strong>
-          </div>
+          <div class="info-window">
+            <a v-bind:href="infoWindow.place.url" class="place-url">
+              <strong>
+                {{infoWindow.place.name}}
+              </strong>
+            </a>
+            <hr class="hr">
+            <div class="formatted-address">
+              {{infoWindow.place.formatted_address}}
+            </div>
 
-          <div v-if="infoWindow.opening_hours.open_now" class="open">Open</div>
-          <div v-else class="closed">Closed</div>
+            <div v-if="infoWindow.place.rating">
+              {{infoWindow.place.rating}}/5
+            </div>
+
+            <div v-if="infoWindow.place.opening_hours.open_now" class="open">Open</div>
+            <div v-else class="closed">Closed</div>
+          </div>
 
         </google-info-window>
 
@@ -38,17 +50,19 @@
         </div>
       </form>
     </div>
+    <icon></icon>
   </div>
 </template>
 
 <script>
-import * as VueGoogleMaps from "vue2-google-maps";
-import Vue from "vue";
+import * as VueGoogleMaps from 'vue2-google-maps';
+import Icon from 'vue-awesome/icons'
+import Vue from 'vue';
 
 Vue.use(VueGoogleMaps, {
   load: {
-    key: "AIzaSyC5VC6RZzQe84X7bFJUL3rJc-ZKIgrvw2c",
-    libraries: "places"
+    key: 'AIzaSyC5VC6RZzQe84X7bFJUL3rJc-ZKIgrvw2c',
+    libraries: 'places'
   }
 });
 
@@ -60,9 +74,10 @@ Vue.use(VueGoogleMaps, {
 
 export default {
   components: {
-    "google-map": VueGoogleMaps.Map,
-    "google-marker": VueGoogleMaps.Marker,
-    "google-info-window": VueGoogleMaps.InfoWindow
+    'google-map': VueGoogleMaps.Map,
+    'google-marker': VueGoogleMaps.Marker,
+    'google-info-window': VueGoogleMaps.InfoWindow,
+    'icon': Icon
   },
   data() {
     return {
@@ -73,16 +88,19 @@ export default {
         circle: null
       },
       infoWindow: {
-        content: "",
+        name: '',
         position: { lat: 0, lng: 0 },
         open: false,
         options: { pixelOffset: { width: 0, height: -35 } },
         index: null,
-        opening_hours: {}
+        place: {
+          name: '',
+          opening_hours: {}
+        }
       },
-      userAddress: "",
-      userRadius: "804",
-      type: ""
+      userAddress: '',
+      userRadius: '804',
+      type: ''
     };
   },
   methods: {
@@ -100,14 +118,14 @@ export default {
       }
 
       geocoder.geocode({ address: this.userAddress }, (results, status) => {
-        if (status == "OK") {
+        if (status == 'OK') {
           this.gMap.center = results[0].geometry.location;
 
           this.gMap.circle = new google.maps.Circle({
-            strokeColor: "#FF0000",
+            strokeColor: '#FF0000',
             strokeOpacity: 0,
             strokeWeight: 2,
-            fillColor: "#FF0000",
+            fillColor: '#FF0000',
             fillOpacity: 0,
             map: this.$refs.map.$mapObject,
             center: this.gMap.center,
@@ -117,12 +135,13 @@ export default {
           var request = {
             location: results[0].geometry.location,
             // radius: 200,
-            query: "milk tea",
+            query: 'milk tea',
             rankBy: google.maps.places.RankBy.DISTANCE
           };
 
           service.textSearch(request, (results, status) => {
-            if (status == "OK") {
+            console.log(results[0]);
+            if (status == 'OK') {
               for (let result of results) {
                 if (
                   this.gMap.circle
@@ -151,20 +170,20 @@ export default {
                 );
                 setTimeout(() => {
                   alert(
-                    "No results found.\nPlease enter a new location or increase your search radius"
+                    'No results found.\nPlease enter a new location or increase your search radius'
                   );
                 }, 500);
               }
             } else {
               alert(
-                "Places search was not successful for the following reason: " +
+                'Places search was not successful for the following reason: ' +
                   status
               );
             }
           });
         } else {
           alert(
-            "Geocode was not successful for the following reason: " + status
+            'Geocode was not successful for the following reason: ' + status
           );
         }
       });
@@ -179,38 +198,50 @@ export default {
             this.gMap.zoom = 12;
           },
           () => {
-            alert("Geocoder failed.");
+            alert('Geocoder failed.');
           }
         );
       } else {
-        alert("Geolocation is not supported by this browser.");
+        alert('Geolocation is not supported by this browser.');
       }
     },
 
     toggleInfoWindow: function(marker, index) {
-      this.infoWindow.open = true;
-      this.infoWindow.position = marker.position;
-      this.infoWindow.index = index;
+      const service = new google.maps.places.PlacesService(
+        this.$refs.map.$mapObject
+      );
 
-      this.infoWindow.content = marker.name;
-      this.infoWindow.opening_hours = marker.opening_hours;
+      service.getDetails({ placeId: marker.place_id }, (place, status) => {
+        if (status == 'OK') {
+          console.log(place);
+          this.infoWindow.open = true;
+          this.infoWindow.position = marker.position;
+          this.infoWindow.index = index;
 
-      this.$refs.map.panTo(marker.position);
+          this.infoWindow.place = place;
+
+          this.infoWindow.name = marker.name;
+          this.infoWindow.opening_hours = marker.opening_hours;
+          this.infoWindow.rating = marker.rating;
+
+          this.$refs.map.panTo(marker.position);
+        }
+      });
     },
 
     test: function() {
-      console.log("test");
+      console.log('test');
     }
   },
   mounted() {
     // Apply border-radius of .vue-map after it has loaded
-    var vueMap = document.querySelector(".vue-map");
-    vueMap.setAttribute("style", "border-radius: 0.3rem");
+    var vueMap = document.querySelector('.vue-map');
+    vueMap.setAttribute('style', 'border-radius: 0.3rem');
   }
 };
 </script>
 
-<style scoped>
+<style>
 .g-map {
   margin: 10px auto;
   box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
@@ -249,5 +280,21 @@ export default {
 .btn-primary {
   background-color: #4caaf5;
   border-color: #4caaf5;
+}
+
+.place-url {
+  color: #4caaf5;
+}
+
+.info-window {
+  font-size: 14px;
+}
+
+.info-window .hr {
+  margin: 6px 0;
+}
+
+.info-window .formatted-address {
+  margin: 10px 0;
 }
 </style>
