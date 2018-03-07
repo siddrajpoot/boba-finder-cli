@@ -54,6 +54,22 @@
         </div>
       </form>
     </div>
+
+    <div class="container list" v-if="gMap.markers">
+      <div class="row justify-content-center">
+        <h3 class="text-center col-12 my-3">Results</h3>
+        <div v-for="marker in gMap.markers" class="col-6 col-md-4 mb-3">
+          <div class="card">
+            <div class="card-top">
+              <h5 class="card-title">{{marker.name}}</h5>
+              <h6 class="card-subtitle text-muted"> {{marker.place.formatted_address}} </h6>
+            </div>
+            <div class="card-body">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -276,7 +292,7 @@ label:focus,
 
 .g-map {
   margin: 10px auto;
-  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+  box-shadow: 1px 2px 6px 0 hsla(0, 0%, 0%, 0.1);
   border-radius: 0.3rem;
 }
 
@@ -326,4 +342,28 @@ label:focus,
 .info-window .hr {
   margin: 6px 0;
 }
+
+.list .card {
+  border: none;
+  box-shadow: 1px 2px 6px 0 hsla(0, 0%, 0%, 0.1);
+  border-radius: 0.4rem;
+}
+
+.list .card-top {
+  padding: 0.8rem;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.list .card-title {
+}
+
+.list .card-subtitle {
+  font-size: 0.8rem;
+}
+
+.list .card-body {
+  background: hsl(0, 0%, 98%);
+}
 </style>
+  

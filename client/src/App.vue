@@ -19,13 +19,17 @@ export default {
 <style>
 @import url('https://fonts.googleapis.com/css?family=Varela+Round');
 
+body {
+  height: 100vh;
+  background-color: #eacbaf12;  
+}
+
 #app {
   font-family: 'Varela Round', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  background-color: #eacbaf12;
-  height: 100vh;
+  height: 100%;
 }
 
 /* body {
