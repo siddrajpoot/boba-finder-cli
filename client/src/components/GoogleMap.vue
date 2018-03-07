@@ -5,7 +5,7 @@
 
         <google-info-window v-bind:options="infoWindow.options" v-bind:position="infoWindow.position" v-bind:opened="infoWindow.open" v-on:closeclick="infoWindow.open=false">
           <div class="info-window">
-            <a v-bind:href="infoWindow.place.url" class="place-url">
+            <a target="_blank" v-bind:href="infoWindow.place.url" class="place-url">
               <strong>
                 {{infoWindow.place.name}}
               </strong>
@@ -17,7 +17,7 @@
 
             <div>{{infoWindow.place.formatted_phone_number}}</div>
 
-            <a v-bind:href="infoWindow.place.website">Website</a>
+            <a target="_blank" v-bind:href="infoWindow.place.website">Website</a>
 
             <div v-if="infoWindow.place.rating">
               {{infoWindow.place.rating}}/5
@@ -163,6 +163,16 @@ export default {
                     rating: result.rating,
                     opening_hours: result.opening_hours
                   });
+                  this.gMap.markers.forEach(marker => {
+                    service.getDetails(
+                      { placeId: marker.place_id },
+                      (place, status) => {
+                        if (status == 'OK') {
+                          marker.place = place;
+                        }
+                      }
+                    );
+                  });
                 }
               }
               if (this.gMap.markers.length >= 1) {
@@ -217,23 +227,15 @@ export default {
         this.$refs.map.$mapObject
       );
 
-      service.getDetails({ placeId: marker.place_id }, (place, status) => {
-        if (status == 'OK') {
-          console.log(place);
-          this.infoWindow.open = true;
-          this.infoWindow.position = marker.position;
-          this.infoWindow.index = index;
+      this.infoWindow.open = true;
+      this.infoWindow.position = marker.position;
+      this.infoWindow.index = index;
 
-          this.infoWindow.place = place;
+      this.infoWindow.place = marker.place;
 
-          var photo = this.infoWindow.place.photos[0].getUrl({
-            maxHeight: 500,
-            maxWidth: 500
-          });
-          console.log(photo);
-
-          this.$refs.map.panTo({lat: marker.position.lat() + .001, lng: marker.position.lng()});
-        }
+      this.$refs.map.panTo({
+        lat: marker.position.lat() + 0.001,
+        lng: marker.position.lng()
       });
     },
 
@@ -307,7 +309,7 @@ label:focus,
   background: url(../assets/down-arrow.png) 97% / 8% no-repeat;
 }
 
-.btn-primary {  
+.btn-primary {
   background-color: #4caaf5;
   border-color: #4caaf5;
 }
@@ -324,5 +326,4 @@ label:focus,
 .info-window .hr {
   margin: 6px 0;
 }
-
 </style>
